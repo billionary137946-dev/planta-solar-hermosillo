@@ -110,7 +110,7 @@ h1 span{color:var(--solar)}
 .dock{position:fixed;left:0;right:0;bottom:0;z-index:9;display:flex;justify-content:center;
   align-items:flex-end;gap:14px;padding:16px 22px 20px;pointer-events:none;flex-wrap:wrap}
 .dock > *{pointer-events:auto}
-.buildbar{width:min(700px,100%);padding:14px 17px 12px}
+.buildbar{width:min(700px,100%);padding:12px 15px 10px}
 .bb-head{display:flex;justify-content:space-between;align-items:center;gap:14px}
 .bb-label{font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim)}
 .bb-stage{font-size:14.5px;font-weight:600;margin-top:2px;letter-spacing:.01em}
@@ -202,17 +202,52 @@ table.ph tr.total td{color:var(--solar);font-weight:600;border-bottom:0}
 .fatal{position:fixed;inset:0;display:grid;place-items:center;padding:30px;text-align:center;
   font-size:14px;color:var(--mut);z-index:50;background:#04070f}
 
-/* riel de zonas */
-.zonerail{position:fixed;right:20px;top:50%;transform:translateY(-50%);z-index:6;
-  display:flex;flex-direction:column;gap:2px;padding:6px;border-radius:15px;transition:opacity .2s}
+/* riel de zonas: vertical, solo iconos, discreto hasta que lo usas */
+.zonerail{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:6;
+  display:flex;flex-direction:column;gap:1px;padding:5px;border-radius:14px;
+  opacity:.5;transition:opacity .25s}
+.zonerail:hover,.zonerail:focus-within{opacity:1}
 .zonerail.dim{opacity:0;pointer-events:none}
-.zonerail button{width:62px;padding:6px 3px 5px;border-radius:10px;display:flex;flex-direction:column;
-  align-items:center;gap:3px;color:var(--mut);font-size:8px;letter-spacing:.02em;transition:.15s;line-height:1}
+.zonerail button{position:relative;width:42px;height:32px;border-radius:9px;
+  display:grid;place-items:center;color:var(--mut);transition:.15s}
 .zonerail button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.5;
   stroke-linecap:round;stroke-linejoin:round}
-.zonerail button span{white-space:nowrap}
-.zonerail button:hover{background:rgba(255,255,255,.06);color:var(--txt)}
-.zonerail button.on{color:var(--solar);background:rgba(255,181,71,.1)}
+.zonerail button span{display:none}
+.zonerail button::after{content:attr(data-label);position:absolute;right:calc(100% + 9px);top:50%;
+  transform:translateY(-50%) translateX(4px);white-space:nowrap;font-size:10px;letter-spacing:.03em;
+  color:var(--txt);background:rgba(8,15,30,.94);border:1px solid var(--line);padding:4px 9px;
+  border-radius:7px;opacity:0;pointer-events:none;transition:.15s}
+.zonerail button:hover{background:rgba(255,255,255,.07);color:var(--txt)}
+.zonerail button:hover::after{opacity:1;transform:translateY(-50%)}
+.zonerail button.on{color:var(--solar);background:rgba(255,181,71,.12)}
+
+/* botón flotante cuando el riel no cabe */
+.zone-toggle{position:fixed;right:12px;top:50%;transform:translateY(-50%);z-index:7;
+  width:44px;height:44px;border-radius:50%;display:none;place-items:center;color:var(--mut);
+  opacity:.8;transition:opacity .2s,transform .2s}
+.zone-toggle.show{display:grid}
+.zone-toggle:hover{opacity:1;color:var(--txt)}
+.zone-toggle svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.6;
+  stroke-linecap:round;stroke-linejoin:round}
+body.card-open .zone-toggle{opacity:0;pointer-events:none}
+
+/* riel desplegado (modo compacto) */
+body.rail-collapsed .zonerail{display:none}
+body.rail-collapsed .zonerail.open{display:flex;opacity:1;overflow-y:auto;overscroll-behavior:contain;
+  padding:6px;gap:1px;scrollbar-width:thin;box-shadow:0 22px 60px rgba(0,0,0,.6)}
+body.rail-collapsed .zonerail.open button{width:138px;height:27px;grid-template-columns:18px 1fr;
+  justify-items:start;gap:8px;padding:0 9px}
+body.rail-collapsed .zonerail.open button svg{width:15px;height:15px}
+body.rail-collapsed .zonerail.open button span{display:inline;font-size:9.5px;letter-spacing:.02em;
+  white-space:nowrap}
+body.rail-collapsed .zonerail.open button::after{display:none}
+.rail-backdrop{position:fixed;inset:0;z-index:5;background:rgba(2,5,12,.45);
+  opacity:0;pointer-events:none;transition:opacity .2s}
+.rail-backdrop.show{opacity:1;pointer-events:auto}
+
+/* al orbitar, la interfaz se aparta para dejar ver la planta */
+body.orbiting .top,body.orbiting .kpis,body.orbiting .zonerail,
+body.orbiting .zone-toggle,body.orbiting .dock{opacity:.08;transition:opacity .3s}
 
 /* etapas */
 .stages{display:flex;gap:5px;overflow-x:auto;margin-top:7px;padding-bottom:2px;scrollbar-width:none}
@@ -225,7 +260,7 @@ table.ph tr.total td{color:var(--solar);font-weight:600;border-bottom:0}
 .stage-chip.on{color:var(--solar);border-color:rgba(255,181,71,.38);background:rgba(255,181,71,.09)}
 
 /* fila de hora */
-.time-row{display:flex;align-items:center;gap:10px;margin-top:7px;padding-top:8px;border-top:1px solid rgba(124,166,232,.1)}
+.time-row{display:flex;align-items:center;gap:10px;margin-top:6px;padding-top:7px;border-top:1px solid rgba(124,166,232,.1)}
 .time-row .tr-label{font-size:8.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);white-space:nowrap}
 .time-row input[type=range]{margin:0;height:14px;flex:1}
 .time-row input[type=range]::-webkit-slider-runnable-track{height:3px;
@@ -259,12 +294,6 @@ table.ph tr.total td{color:var(--solar);font-weight:600;border-bottom:0}
   .kpi .v{font-size:15px;margin-top:1px}
   .kpi .s{display:none}
   .kpi .k{font-size:7.5px;letter-spacing:.1em;white-space:nowrap}
-  /* riel de zonas en horizontal, justo encima del dock */
-  .zonerail{left:12px;right:12px;top:auto;transform:none;flex-direction:row;gap:2px;
-    padding:5px;border-radius:14px;overflow-x:auto;scrollbar-width:none;justify-content:flex-start}
-  .zonerail::-webkit-scrollbar{display:none}
-  .zonerail button{width:auto;min-width:54px;flex:0 0 auto;padding:5px 4px 4px}
-  .zonerail button span{font-size:7.5px}
   .hint{display:none}
   .infocard{right:12px;left:12px;width:auto;top:auto}
   .tabs button{padding:6px 9px;font-size:10.5px}
@@ -278,13 +307,6 @@ table.ph tr.total td{color:var(--solar);font-weight:600;border-bottom:0}
   .stages{margin-top:5px}
   .time-row{margin-top:5px;padding-top:6px}
 }
-/* riel vertical compacto en portátiles (720–900 px de alto) */
-@media (min-width:981px) and (max-height:900px){
-  .zonerail{gap:1px;padding:5px}
-  .zonerail button{padding:4px 3px 3px;gap:2px}
-  .zonerail button svg{width:15px;height:15px}
-  .zonerail button span{font-size:7px}
-}
 @media (max-width:640px){
   .top{flex-direction:column;gap:6px;align-items:flex-start}
   .right-top{flex-direction:row;align-items:center;flex-wrap:wrap;gap:6px}
@@ -292,7 +314,6 @@ table.ph tr.total td{color:var(--solar);font-weight:600;border-bottom:0}
   .bb-stage{font-size:12px}
   .bb-pct{font-size:18px}
   .bb-label{font-size:8.5px}
-  .zonerail button{min-width:50px}
 }
 @media (max-width:420px){
   h1{font-size:19px}
@@ -322,7 +343,6 @@ table.ph tr.total td{color:var(--solar);font-weight:600;border-bottom:0}
 }
 /* altura muy corta: se prioriza la escena 3D */
 @media (max-height:560px){
-  .zonerail{display:none}
   .kpi{padding:4px 8px 5px}
   .kpi .v{font-size:13.5px}
   .kpi .k{font-size:7px}
@@ -363,7 +383,7 @@ table.ph tr.total td{color:var(--solar);font-weight:600;border-bottom:0}
   .time-row input[type=range]{height:20px}
   .time-row input[type=range]::-webkit-slider-thumb{width:18px;height:18px;margin-top:-7.5px}
   .time-row input[type=range]::-moz-range-thumb{width:18px;height:18px}
-  .zonerail button{min-width:58px;padding:7px 5px 6px}
+  .zonerail button{width:46px;height:38px}
   .zonerail button svg{width:19px;height:19px}
   .ic-close{width:34px;height:34px}
   .stage-chip{padding:7px 10px}

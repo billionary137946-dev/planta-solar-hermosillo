@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="dark">
 <meta name="robots" content="noindex, nofollow">
 <title>Planta Solar Híbrida · Render de construcción interactivo</title>
-<link rel="stylesheet" href="styles.css?v=13">
+<link rel="stylesheet" href="styles.css?v=14">
 </head>
 <body>
 
@@ -61,47 +61,52 @@
 </aside>
 
 <nav class="zonerail glass" id="zonerail" aria-label="Ir a zonas del proyecto">
-  <button data-zone="overview" class="on" title="Vista general">
+  <button data-zone="overview" data-label="General" class="on" title="Vista general">
     <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
     <span>General</span>
   </button>
-  <button data-zone="pv" title="Campo fotovoltaico">
+  <button data-zone="pv" data-label="Campo FV" title="Campo fotovoltaico">
     <svg viewBox="0 0 24 24"><path d="M4 15.5L7 6h10l3 9.5z"/><path d="M4 15.5h16M9.3 6L8.4 15.5M14.7 6l.9 9.5"/></svg>
     <span>Campo FV</span>
   </button>
-  <button data-zone="tower" title="Torre termosolar y helióstatos">
+  <button data-zone="tower" data-label="Torre" title="Torre termosolar y helióstatos">
     <svg viewBox="0 0 24 24"><path d="M12 3v3M5 6l2.2 1.2M19 6l-2.2 1.2"/><path d="M9.6 21l2.4-12 2.4 12z"/><circle cx="12" cy="7" r="1.6"/></svg>
     <span>Torre</span>
   </button>
-  <button data-zone="store" title="Almacenamiento térmico">
+  <button data-zone="store" data-label="Sales" title="Almacenamiento térmico">
     <svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="6" ry="2.5"/><path d="M6 6v12c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V6"/></svg>
     <span>Sales</span>
   </button>
-  <button data-zone="sub" title="Subestación e interconexión">
+  <button data-zone="sub" data-label="Subestación" title="Subestación e interconexión">
     <svg viewBox="0 0 24 24"><path d="M13 2L4 14h6l-1 8 9-12h-6z"/></svg>
     <span>Subestación</span>
   </button>
-  <button data-zone="bess" title="Baterías (BESS)">
+  <button data-zone="bess" data-label="BESS" title="Baterías (BESS)">
     <svg viewBox="0 0 24 24"><rect x="3" y="7" width="16" height="10" rx="2"/><path d="M21 10v4M7 10v4M11 10v4M15 10v4"/></svg>
     <span>BESS</span>
   </button>
-  <button data-zone="h2" title="Hidrógeno verde">
+  <button data-zone="h2" data-label="Hidrógeno" title="Hidrógeno verde">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M9 16V8M15 16V8M9 12h6"/></svg>
     <span>H₂</span>
   </button>
-  <button data-zone="line" title="Línea de transmisión">
+  <button data-zone="line" data-label="Red" title="Línea de transmisión">
     <svg viewBox="0 0 24 24"><path d="M12 3v18M6 21l6-9 6 9M8 9h8M9 6h6"/></svg>
     <span>Red</span>
   </button>
-  <button data-zone="usa" title="Exportación a EE. UU.">
+  <button data-zone="usa" data-label="EE. UU." title="Exportación a EE. UU.">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c3 3.5 3 12.5 0 16M12 4c-3 3.5-3 12.5 0 16"/></svg>
     <span>EE. UU.</span>
   </button>
-  <button data-zone="community" title="Electrificación de comunidades">
+  <button data-zone="community" data-label="Comunidad" title="Electrificación de comunidades">
     <svg viewBox="0 0 24 24"><path d="M3 11l4-3 4 3v9H3zM13 11l4-3 4 3v9h-8z"/><path d="M6 17h2M16 17h2"/></svg>
     <span>Comunidad</span>
   </button>
 </nav>
+
+<div class="rail-backdrop" id="railBackdrop"></div>
+<button class="zone-toggle glass" id="zoneToggle" aria-label="Ver zonas del proyecto" aria-expanded="false" title="Zonas del proyecto">
+  <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+</button>
 
 <button class="pin hidden" id="pin-pv" data-key="pv" title="Campo fotovoltaico">1</button>
 <button class="pin hidden" id="pin-tower" data-key="tower" title="Torre termosolar">2</button>
@@ -195,6 +200,6 @@
 </div>
 
 <script src="three.min.js"></script>
-<script src="app.js?v=12"></script>
+<script src="app.js?v=14"></script>
 </body>
 </html>

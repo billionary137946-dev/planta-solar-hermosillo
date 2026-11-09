@@ -1150,6 +1150,7 @@ function goZone(key) {
   orbit.tTheta = z.theta;
   orbit.tPhi = z.phi;
   if (key === 'overview') closeInfo(); else openInfo(key);
+  setRailOpen(false);
 }
 document.querySelectorAll('.zonerail button').forEach(b => {
   b.addEventListener('click', () => {
@@ -1220,10 +1221,14 @@ function openInfo(key) {
   $('#icMeta').innerHTML = d.meta;
   infoCard.hidden = false;
   $('#zonerail').classList.add('dim');
+  document.body.classList.add('card-open');
+  zoneToggle.classList.remove('show');
 }
 function closeInfo() {
   infoCard.hidden = true;
   $('#zonerail').classList.remove('dim');
+  document.body.classList.remove('card-open');
+  if (document.body.classList.contains('rail-collapsed')) zoneToggle.classList.add('show');
 }
 
 $('#infoClose').addEventListener('click', closeInfo);
@@ -1368,6 +1373,7 @@ canvas.addEventListener('pointerdown', e => {
   canvas.setPointerCapture(e.pointerId);
   pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
   moved = 0;
+  document.body.classList.add('orbiting');
   if (pointers.size === 2) {
     const [a, b] = [...pointers.values()];
     pinchDist = Math.hypot(a.x - b.x, a.y - b.y);
@@ -1395,11 +1401,15 @@ function endPointer(e) {
   if (!pointers.has(e.pointerId)) return;
   const wasSingle = pointers.size === 1;
   pointers.delete(e.pointerId);
+  if (pointers.size === 0) document.body.classList.remove('orbiting');
   canvas.style.cursor = 'grab';
   if (wasSingle && moved < 8) pick(e.clientX, e.clientY);
 }
 canvas.addEventListener('pointerup', endPointer);
-canvas.addEventListener('pointercancel', e => pointers.delete(e.pointerId));
+canvas.addEventListener('pointercancel', e => {
+  pointers.delete(e.pointerId);
+  if (pointers.size === 0) document.body.classList.remove('orbiting');
+});
 canvas.addEventListener('wheel', e => {
   e.preventDefault();
   if (state.camAuto) { state.camAuto = false; setCamToggle(); }
@@ -1428,11 +1438,8 @@ function showToast() {
   toastEl.textContent = state.phase === 2
     ? 'Planta energizada · 500 MW · comunidades + exportación a EE. UU.'
     : 'Fase 1 energizada · 300 MW · venta a comunidades y red nacional';
-  const stacked = innerWidth <= 980 || innerHeight < 720;
   const dockH = dockEl.getBoundingClientRect().height;
-  const railH = stacked && getComputedStyle(railEl).display !== 'none'
-    ? railEl.getBoundingClientRect().height + 8 : 0;
-  toastEl.style.bottom = (dockH + railH + 18) + 'px';
+  toastEl.style.bottom = (dockH + 18) + 'px';
   toastEl.classList.add('on');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toastEl.classList.remove('on'), 4600);
@@ -1492,10 +1499,27 @@ const topEl = document.querySelector('.top');
 const kpisEl = document.querySelector('.kpis');
 const dockEl = document.querySelector('.dock');
 const railEl = document.getElementById('zonerail');
+const zoneToggle = document.getElementById('zoneToggle');
+const railBackdrop = document.getElementById('railBackdrop');
+
+function setRailOpen(open) {
+  railEl.classList.toggle('open', open);
+  railBackdrop.classList.toggle('show', open);
+  zoneToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+zoneToggle.addEventListener('click', () => {
+  setRailOpen(!railEl.classList.contains('open'));
+});
+railBackdrop.addEventListener('click', () => setRailOpen(false));
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') setRailOpen(false);
+});
 
 /* Apila los bloques según la altura real de la cabecera.
    Evita que la tira de KPIs se monte encima del título o de las pestañas
    cuando la pantalla es baja o estrecha. */
+let railNeed = 0;
+
 function layoutChrome() {
   const stacked = innerWidth <= 980 || innerHeight < 720;
   const topBottom = topEl.getBoundingClientRect().bottom;
@@ -1512,21 +1536,35 @@ function layoutChrome() {
   }
   kpisEl.style.transform = 'none';
 
-  /* riel de zonas: vertical a la derecha o fila sobre el dock */
-  const lift = Math.round(dockH) + 8;
-  railEl.style.bottom = stacked ? lift + 'px' : '';
-  const railVisible = getComputedStyle(railEl).display !== 'none';
-  const railH = stacked && railVisible ? Math.round(railEl.getBoundingClientRect().height) : 0;
+  /* riel de zonas: se repliega en un botón flotante si no hay alto suficiente */
+  if (!railNeed) railNeed = railEl.getBoundingClientRect().height || 340;
+  const railRoom = dockTop - (topBottom + 8) - 10;
+  const collapsed = innerWidth < 760 || innerHeight < 560 || railRoom < railNeed + 24;
+  document.body.classList.toggle('rail-collapsed', collapsed);
+  zoneToggle.classList.toggle('show', collapsed && !document.body.classList.contains('card-open'));
+  if (!collapsed) setRailOpen(false);
 
-  /* ficha de zona: encima del dock (o del riel) en compacto, bajo la cabecera en escritorio */
+  /* ficha de zona */
+  const lift = Math.round(dockH) + 10;
   if (stacked) {
     infoCard.style.top = '';
-    infoCard.style.bottom = (lift + railH + 2) + 'px';
+    infoCard.style.bottom = lift + 'px';
   } else {
     infoCard.style.bottom = '';
     infoCard.style.top = Math.round(topBottom + 12) + 'px';
   }
-  return { topBottom, dockH, dockTop, railH, stacked };
+
+  /* el panel de zonas vive en el hueco entre cabecera y dock */
+  if (collapsed) {
+    railEl.style.top = Math.round(topBottom + 12) + 'px';
+    railEl.style.transform = 'none';
+    railEl.style.maxHeight = Math.max(150, Math.round(railRoom)) + 'px';
+  } else {
+    railEl.style.top = '';
+    railEl.style.transform = '';
+    railEl.style.maxHeight = '';
+  }
+  return { topBottom, dockH, dockTop, stacked };
 }
 
 function onResize() {
@@ -1535,7 +1573,7 @@ function onResize() {
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
   renderer.setSize(innerWidth, innerHeight);
 
-  const { topBottom, dockH, railH, stacked } = layoutChrome();
+  const { topBottom, dockH, stacked } = layoutChrome();
   const kpisRect = kpisEl.getBoundingClientRect();
   const kpisVisible = getComputedStyle(kpisEl).display !== 'none';
   const bandTop = (stacked && kpisVisible ? Math.max(topBottom, kpisRect.bottom) : topBottom) + 6;
@@ -1549,9 +1587,9 @@ function onResize() {
   if (state.camAuto) directCamera(state.shown);
 
   const hint = document.querySelector('.hint');
-  if (hint) hint.style.bottom = (dockH + railH + 14) + 'px';
+  if (hint) hint.style.bottom = (dockH + 14) + 'px';
   const toast = document.querySelector('.toast');
-  if (toast) toast.style.bottom = (dockH + railH + 18) + 'px';
+  if (toast) toast.style.bottom = (dockH + 18) + 'px';
 }
 addEventListener('resize', onResize);
 
